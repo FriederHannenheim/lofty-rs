@@ -47,7 +47,11 @@ where
 	tag.set_flags(header.flags);
 
 	loop {
-		match Frame::read(reader, header.version, parse_mode)? {
+		let result = Frame::read(reader, header.version, parse_mode);
+		let Ok(result) = result else {
+			continue;
+		};
+		match result {
 			// No frame content found, and we can expect there are no more frames
 			(None, true) => break,
 			(Some(f), false) => drop(tag.insert(f)),
